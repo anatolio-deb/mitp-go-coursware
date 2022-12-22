@@ -1,6 +1,11 @@
-# Лекция 1. Язык программирования Go
+---
+theme: default
+---
+
+# Язык программирования Go
 ## История, особенности и возможности Go
 ### Анатолий Никифоров, МФТИ, 2023
+#### Лекция 1
 
 ---
 
@@ -21,9 +26,36 @@
 
 # Связь со мной
 
-- [nikiforova693@gmail.com](mailto:nikiforova693@gmail.com)
-- [@anatolio_nikiforidis](http://t.me/anatolio_nikiforidis) — Telegram
-- [@bachelorscoding](http://t.me/bachelorscoding) (канал)
+<div class="flex py-1">
+    <div class="flex-col self-center px-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Circle-icons-mail.svg/1024px-Circle-icons-mail.svg.png" class="h-5"/>
+    </div>
+    <a class="flex-col" href="mailto:nikiforova693@gmail.com">nikiforova693@gmail.com</a>
+</div>
+<div class="flex py-1">
+    <div class="flex-col self-center px-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" class="h-5"/>
+    </div>
+    <a class="flex-col" href="https://github.com/anatolio-deb">@anatolio-deb</a>
+</div>
+<div class="flex py-1">
+    <div class="flex-col self-center px-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/LinkedIn_icon_circle.svg/640px-LinkedIn_icon_circle.svg.png" class="h-5"/>
+    </div>
+    <a class="flex-col" href="https://linkedin.com/in/anatolio-nikiforidis/">https://linkedin.com/in/anatolio-nikiforidis</a>
+</div>
+<div class="flex py-1">
+    <div class="flex-col self-center px-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png" class="h-5"/>
+    </div>
+    <a class="flex-col" href="https://t.me/anatolio_nikiforidis">@anatolio_nikiforidis</a>
+</div>
+<div class="flex py-1">
+    <div class="flex-col self-center px-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png" class="h-5"/>
+    </div>
+    <a class="flex-col" href="https://t.me/bachelorscoding">@bachelorscoding</a>
+</div>
 
 ---
 
