@@ -1,4 +1,7 @@
 ---
+src : ./pages/contents.md
+---
+---
 src: ./pages/lecture1.md
 ---
 ---

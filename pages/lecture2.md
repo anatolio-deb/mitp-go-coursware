@@ -118,6 +118,98 @@ This material may be protected by copyright.
 
 </v-clicks>
 
+---
+---
+# Объявления
+<v-clicks>
+
+- 4 главных типа объявлений: `var const type func`
+- Исходный код прогарммы хранится в одном и более файлах с расширением `.go`
+- Каждый файл начинается с объявления `package` - пакет, частью которого является файл
+- После `package` следуют объявления любых `import`
+- После `import` следуют объявления на уровне пакета (типы, переменные, константы, функции)
+
+</v-clicks>
+
+---
+layout: two-cols
+---
+
+# Пример
+
+```go
+// Boiling prints the boiling point of water.
+package main
+
+import "fmt"
+
+const boilingF = 212.0
+
+func main() {
+    var f = boilingF
+    var c = (f - 32) * 5 / 9
+    fmt.Printf("boiling point = %g°F or %g°C\n", f, c)
+    // Output:
+    // boiling point = 212°F or 100°C
+}
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+::right::
+
+<div class="pt-14 pl-8">
+    <ul>
+        <li>Константа <span class="font-mono">boilingF</span> объявлена на уровне пакета <span class="font-mono">main</span></li>
+        <li>Переменные <span class="font-mono">f</span> и <span class="font-mono">c</span> локальны для функции <span class="font-mono">main</span></li>
+        <li><span class="font-mono">boilingF</span> видна во всех файлах пакета <span class="font-mono">main</span></li>
+        <li><span class="font-mono">f</span> и <span class="font-mono">c</span> видны только в функции <span class="font-mono">main</span></li>
+    </ul>
+</div>
+
+---
+layout: two-cols
+---
+
+# Пример
+
+```go
+// Ftoc prints two Fahrenheit-to-Celsius conversions.
+package main
+
+import "fmt"
+
+func main() {
+    const freezingF, boilingF = 32.0, 212.0
+    fmt.Printf("%g°F = %g°C\n", freezingF, fToC(freezingF)) // "32°F = 0°C
+    fmt.Printf("%g°F = %g°C\n", boilingF, fToC(boilingF))   // "212°F = 100°C"
+}
+
+func fToC(f float64) float64 {
+    return (f - 32) * 5 / 9
+}
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+::right::
+
+<div class="pt-14 pl-8">
+    <ul>
+        <li>Объявление функции может включать опциональный список результатов</li>
+        <li>Объявление параметров функции сопровождается указанием типов</li>
+        <li>Если функция ничего не возвращает, список результатов в объявлении опускается.</li>
+    </ul>
+</div>
+---
 
 ---
 layout: end
