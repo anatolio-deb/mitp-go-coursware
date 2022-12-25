@@ -211,6 +211,186 @@ This material may be protected by copyright.
 </div>
 ---
 
+# Переменные
+
+- Объявление `var` создает переменную определенного типа, задает ей имя и устанавливает начальное значение.
+
+## Общая форма
+
+var _имя_ _тип_ = _выражение_
+
+- Можно опустить либо тип, либо выражение
+- Если опущен тип, он определяется из выражения
+- Если опущено выражение, то в переменную заносится нулевое значение (`0`, `""`, `false`, `nil`)
+
+### Пример
+
+```go
+var s string
+fmt.Println(s) // ""
+```
+
+---
+
+# Порядок инициализации
+
+- Переменные на уровне пакета инициализируются до начала функции `main``
+- Локальные переменные инициализируются по мере достижения исполнения их функций
+
+---
+
+# Множественное объявление переменных
+
+```go
+var i, j, k int                 // int, int, int
+var b, f, s = true, 2.3, "four" // bool, float64, string
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+## Возвращаемые значения функции в качестве значений множества переменных
+
+```go
+var f, err = os.Open(name) // os.Open returns a file and an error
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+---
+
+# Короткие объявления переменных
+
+- Доступны для локальных переменных (внутри функций)
+
+## Общая форма
+
+_имя_ := _выражение_
+
+## Пример
+
+```go
+anim := gif.GIF{LoopCount: nframes}
+freq := rand.Float64() * 3.0
+t := 0.0
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+---
+
+# Короткое объявление vs var
+
+Объявления типа `var` можно использовать для локальных переменных, когда необходимо задать тип с нулевым значением, которое будет меняться позже.
+
+## Пример 1
+
+Пустой список, который будет заполняться позже
+
+```go
+var countries []string 
+```
+
+## Пример 2
+
+Инициализация структуры со значением `nil`
+
+```go
+var c Country
+```
+
+---
+
+# Множественная инициализация в коротком объявлении
+
+```go
+a, b := 1, 2
+```
+
+## Swap
+
+```go
+a, b = b, a
+```
+
+## Переменные в коротком объялении могут принимать множество значений из функции
+
+```go
+f, err := os.Open(name)
+if err != nil {
+    return err
+}
+// ...use f...
+f.Close()
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+---
+
+# Повторные присваивания в коротких объявлениях
+
+- Если переменные в коротком объявлении были объявлены ранее, то они получают новые значения.
+- Короткое объявление должно содержать хотя-бы одну новую переменную
+
+# Пример 1
+
+Второе объявление присвоит новое значение переменной `err`
+
+```go
+in, err := os.Open(infile)
+// ...
+out, err := os.Create(outfile)
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+---
+
+# Пример 2
+
+```go
+f, err := os.Open(infile)
+// ...
+f, err := os.Create(outfile) // compile error: no new variables
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+## Fix
+
+```go
+f, err := os.Open(infile)
+// ...
+f, err = os.Create(outfile)
+```
+---
+
+# Указатели
+
 ---
 layout: end
 ---
