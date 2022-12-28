@@ -234,7 +234,7 @@ fmt.Println(s) // ""
 
 # Порядок инициализации
 
-- Переменные на уровне пакета инициализируются до начала функции `main``
+- Переменные на уровне пакета инициализируются до начала функции `main`
 - Локальные переменные инициализируются по мере достижения исполнения их функций
 
 ---
@@ -390,6 +390,113 @@ f, err = os.Create(outfile)
 ---
 
 # Указатели
+
+```go
+x := 1
+p := &x         // p, of type *int, points to x
+fmt.Println(*p) // "1"
+*p = 2          // equivalent to x = 2
+fmt.Println(x)  // "2"
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+```go
+var x, y int
+fmt.Println(&x == &x, &x == &y, &x == nil) // "true false false"
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+---
+
+# Для функции безопасно возвращать указатель
+
+```go
+var p = f()
+
+func f() *int {
+    v := 1
+    return &v
+}
+```
+
+Переменная `v` инициализируется при каждом вызове функции `f()` в разных ячейках памяти:
+
+```go
+fmt.Println(f() == f()) // "false"
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+---
+layout: two-cols
+---
+
+# Пакет flag
+
+```go
+// Echo4 prints its command-line arguments.
+package main
+
+import (
+    "flag"
+    "fmt"
+    "strings"
+)
+
+var n = flag.Bool("n", false, "omit trailing newline")
+var sep = flag.String("s", " ", "separator")
+
+func main() {
+    flag.Parse()
+    fmt.Print(strings.Join(flag.Args(), *sep))
+    if !*n {
+        fmt.Println()
+    }
+}
+```
+
+::right::
+
+<div class="pt-16 pl-8">
+
+```
+$ go build gopl.io/ch2/echo4
+$ ./echo4 a bc def
+a bc def
+$ ./echo4 -s / a bc def
+a/bc/def
+$ ./echo4 -n a bc def
+a bc def$
+$ ./echo4 -help
+Usage of ./echo4:
+  -n    omit trailing newline
+  -s string
+        separator (default " ")
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+</div>
+---
+
+# Функция new
 
 ---
 layout: end

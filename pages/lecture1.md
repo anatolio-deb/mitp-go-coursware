@@ -192,20 +192,15 @@ layout: cover
 
 # Go сегодня
 
-- Backend
-- OS
-    - Daemons
-    - CLI
-    - Protocols
-- DevOps
-    - Docker
-    - Kubernetes
-    - Terraform
-    - OpenShift
-    
+<a href="https://github.com/golang/go/wiki/GoUsers">https://github.com/golang/go/wiki/GoUsers</a>
+
+<div class="w-xl">
+    <img src="/Screenshot 2022-12-29 at 00.51.42.png"/>
+</div>
+---
 ---
 
-# Проекты на Go
+# Open Source проекты на Go (мой опыт)
 
 - dnscrypt-proxy — реализация dnscrypt, а затем DoH, переписан с Си со второй версии
 - v2ray — реализует собственный сетевые протоколы (vmess, vless)
