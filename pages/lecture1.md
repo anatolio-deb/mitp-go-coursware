@@ -73,7 +73,8 @@ layout: cover
 - Группа в Telegram
 - Go Playground: [https://go.dev/play/](https://go.dev/play/)
 - Go talks: [https://go.dev/talks/](https://go.dev/talks/)
-- Что-то еще
+- [https://yourbasic.org/](https://yourbasic.org/)
+- [https://gobyexample.com/](https://gobyexample.com/)
 
 ---
 
