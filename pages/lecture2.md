@@ -124,7 +124,7 @@ This material may be protected by copyright.
 <v-clicks>
 
 - 4 главных типа объявлений: `var const type func`
-- Исходный код прогарммы хранится в одном и более файлах с расширением `.go`
+- Исходный код программы хранится в одном и более файлах с расширением `.go`
 - Каждый файл начинается с объявления `package` - пакет, частью которого является файл
 - После `package` следуют объявления любых `import`
 - После `import` следуют объявления на уровне пакета (типы, переменные, константы, функции)
@@ -497,6 +497,29 @@ This material may be protected by copyright.
 ---
 
 # Функция new
+
+- Еще один способ создания переменной
+- `new(T)` создает *безымянную* переменную типа `T`
+
+---
+
+# Пример
+
+```go
+p := new(int)   // p, типа *int, указывает на безымянную переменную int
+fmt.Println(*p) // "0"
+*p = 2          // присваивает значение 2
+fmt.Println(*p) // "2"
+```
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright.
+
+## Это всего лишь синтаксическое соглашение!
+- удобно использовать в выражениях
 
 ---
 layout: end
