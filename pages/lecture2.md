@@ -25,11 +25,7 @@ const        fallthrough  if           range        type
 continue     for          import       return       var
 ```
 <br/><br/>
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 
@@ -86,14 +82,6 @@ This material may be protected by copyright.
             </p>
         </div>
     </div>
-</div>
-
-<div calss="text-sm">
-    Excerpt From
-    The Go Programming Language
-    Brian W. Kernighan
-    https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-    This material may be protected by copyright.
 </div>
 
 ---
@@ -154,11 +142,7 @@ func main() {
 }
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ::right::
 
@@ -194,11 +178,7 @@ func fToC(f float64) float64 {
 }
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ::right::
 
@@ -246,11 +226,7 @@ var i, j, k int                 // int, int, int
 var b, f, s = true, 2.3, "four" // bool, float64, string
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ## Возвращаемые значения функции в качестве значений множества переменных
 
@@ -258,11 +234,7 @@ This material may be protected by copyright.
 var f, err = os.Open(name) // os.Open returns a file and an error
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 
@@ -282,11 +254,7 @@ freq := rand.Float64() * 3.0
 t := 0.0
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 
@@ -335,11 +303,7 @@ if err != nil {
 f.Close()
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 
@@ -358,11 +322,7 @@ in, err := os.Open(infile)
 out, err := os.Create(outfile)
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 
@@ -374,11 +334,7 @@ f, err := os.Open(infile)
 f, err := os.Create(outfile) // compile error: no new variables
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ## Fix
 
@@ -399,22 +355,14 @@ fmt.Println(*p) // "1"
 fmt.Println(x)  // "2"
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ```go
 var x, y int
 fmt.Println(&x == &x, &x == &y, &x == nil) // "true false false"
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 
@@ -435,11 +383,7 @@ func f() *int {
 fmt.Println(f() == f()) // "false"
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 
 ---
 layout: two-cols
@@ -488,11 +432,7 @@ Usage of ./echo4:
         separator (default " ")
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
+
 </div>
 ---
 
@@ -500,6 +440,7 @@ This material may be protected by copyright.
 
 - Еще один способ создания переменной
 - `new(T)` создает *безымянную* переменную типа `T`
+- Используется редко
 
 ---
 
@@ -512,14 +453,63 @@ fmt.Println(*p) // "0"
 fmt.Println(*p) // "2"
 ```
 
-Excerpt From
-The Go Programming Language
-Brian W. Kernighan
-https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
-This material may be protected by copyright.
-
 ## Это всего лишь синтаксическое соглашение!
 - удобно использовать в выражениях
+
+---
+---
+# Эти функции эквивалентны
+
+```go
+func newInt() *int {
+    return new(int)
+}
+```
+
+```go
+func newInt(){
+    var dummy int
+    return &dummy
+}
+```
+
+## Каждый вызов `new` возвращает отдельную переменную с новым адресом
+
+```go
+p := new(int)
+q := new(int)
+fmt.Println(p == q) // "false"
+```
+
+**Исключение**: две переменные нулевого размера и с пустым типом такие, как `struct` или `[]int` имеют одинаковый адрес.
+
+---
+
+# Время жизни переменных
+
+- Переменные, объявленные на уровне пакета, живут все время исполнения программы
+- Локальные переменные живут до тех пор, пока не стануn _недоступными_
+
+---
+
+# Пример 1
+
+```go
+for t := 0.0; t < cycles*2*math.Pi; t += res {
+    x := math.Sin(t)
+    y := math.Sin(t*freq + phase)
+    img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5),
+        blackIndex)
+}
+```
+
+<v-clicks>
+
+- Переменная `t` создается каждый раз, когда начинает исполняться цикл `for`
+- Переменные `x` и `y` создаются при каждой итерации
+- Переменная становится недоступной, когда не существует пути к ее значению
+
+</v-clicks>
 
 ---
 layout: end
