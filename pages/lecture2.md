@@ -13,20 +13,17 @@ layout: cover
 - PascalCase и camelCase
 - Имена начинаются с букв (по Unicode) или с нижнего подчерквивания
 - В именах допустимы цифры и нижние подчеркивания
-- Регистр имеет значение: `heapSort` и `Heapsort` – разные имена
+- Регистр имеет значение: `sortArray` и `Sortarray` – разные имена
 
 ## 25 ключевых слов
 
 ```
-break        default      func         interface    select
-case         defer        go           map          struct
-chan         else         goto         package      switch
-const        fallthrough  if           range        type
-continue     for          import       return       var
+break     default      func    interface  select
+case      defer        go      map        struct
+chan      else         goto    package    switch
+const     fallthrough  if      range      type
+continue  for          import  return     var
 ```
-<br/><br/>
-
-
 ---
 
 # Предварительно объявленные имена
@@ -126,32 +123,27 @@ layout: two-cols
 # Пример
 
 ```go
-// Boiling prints the boiling point of water.
 package main
 
 import "fmt"
 
-const boilingF = 212.0
+const Pi float64 = 3.14
 
 func main() {
-    var f = boilingF
-    var c = (f - 32) * 5 / 9
-    fmt.Printf("boiling point = %g°F or %g°C\n", f, c)
-    // Output:
-    // boiling point = 212°F or 100°C
+	var r float64 = 10.0
+	var c float64 = 2.0 * Pi * r
+	fmt.Println(c)
 }
 ```
-
-
 
 ::right::
 
 <div class="pt-14 pl-8">
     <ul>
-        <li>Константа <span class="font-mono">boilingF</span> объявлена на уровне пакета <span class="font-mono">main</span></li>
-        <li>Переменные <span class="font-mono">f</span> и <span class="font-mono">c</span> локальны для функции <span class="font-mono">main</span></li>
-        <li><span class="font-mono">boilingF</span> видна во всех файлах пакета <span class="font-mono">main</span></li>
-        <li><span class="font-mono">f</span> и <span class="font-mono">c</span> видны только в функции <span class="font-mono">main</span></li>
+        <li>Константа <span class="font-mono">Pi</span> объявлена на уровне пакета <span class="font-mono">main</span></li>
+        <li>Переменные <span class="font-mono">r</span> и <span class="font-mono">c</span> локальны для функции <span class="font-mono">main</span></li>
+        <li><span class="font-mono">Pi</span> видна во всех файлах пакета <span class="font-mono">main</span></li>
+        <li><span class="font-mono">r</span> и <span class="font-mono">c</span> видны только в функции <span class="font-mono">main</span></li>
     </ul>
 </div>
 
@@ -162,19 +154,21 @@ layout: two-cols
 # Пример
 
 ```go
-// Ftoc prints two Fahrenheit-to-Celsius conversions.
+// Circumference calculation.
 package main
 
 import "fmt"
 
 func main() {
-    const freezingF, boilingF = 32.0, 212.0
-    fmt.Printf("%g°F = %g°C\n", freezingF, fToC(freezingF)) // "32°F = 0°C
-    fmt.Printf("%g°F = %g°C\n", boilingF, fToC(boilingF))   // "212°F = 100°C"
+    const Pi float64 = 3.14
+    const r1 float64 = 1.0
+    const r2 float64 = 2.0
+    fmt.Println(circumference(r1)) // +6.280000e+000
+    fmt.Println(circumference(r2))   // +1.256000e+001
 }
 
-func fToC(f float64) float64 {
-    return (f - 32) * 5 / 9
+func circumference(r float64) float64 {
+    return 2.0 * Pi * r
 }
 ```
 
@@ -222,8 +216,8 @@ fmt.Println(s) // ""
 # Множественное объявление переменных
 
 ```go
-var i, j, k int                 // int, int, int
-var b, f, s = true, 2.3, "four" // bool, float64, string
+var a, b, c int                 // int, int, int
+var x, y, z = false, 0.1, "hello" // bool, float64, string
 ```
 
 
@@ -231,10 +225,8 @@ var b, f, s = true, 2.3, "four" // bool, float64, string
 ## Возвращаемые значения функции в качестве значений множества переменных
 
 ```go
-var f, err = os.Open(name) // os.Open returns a file and an error
+var file, err = os.Open("file.go") // os.Open возвращает файл и ошибку
 ```
-
-
 
 ---
 
@@ -249,16 +241,14 @@ _имя_ := _выражение_
 ## Пример
 
 ```go
-anim := gif.GIF{LoopCount: nframes}
-freq := rand.Float64() * 3.0
-t := 0.0
+p := person{"Bob", 20}
+freq := rand.Int() * 2
+x := 1.0
 ```
-
-
 
 ---
 
-# Короткое объявление vs var
+# Короткое объявление vs `var`
 
 Объявления типа `var` можно использовать для локальных переменных, когда необходимо задать тип с нулевым значением, которое будет меняться позже.
 
@@ -295,15 +285,14 @@ a, b = b, a
 ## Переменные в коротком объялении могут принимать множество значений из функции
 
 ```go
-f, err := os.Open(name)
+file, err := os.Open("file.go")
+
 if err != nil {
     return err
 }
-// ...use f...
-f.Close()
+// ...использовать файл...
+file.Close()
 ```
-
-
 
 ---
 
@@ -317,73 +306,83 @@ f.Close()
 Второе объявление присвоит новое значение переменной `err`
 
 ```go
-in, err := os.Open(infile)
+i, err := os.Open("input")
 // ...
-out, err := os.Create(outfile)
+o, err := os.Create("output")
 ```
-
-
 
 ---
 
 # Пример 2
 
 ```go
-f, err := os.Open(infile)
+file, err := os.Open("input")
 // ...
-f, err := os.Create(outfile) // compile error: no new variables
+file, err := os.Create("output") // ошибка компиляции: нет новых переменных
 ```
 
-
+<v-clicks>
 
 ## Fix
 
 ```go
-f, err := os.Open(infile)
+file, err := os.Open("input")
 // ...
-f, err = os.Create(outfile)
+file, err = os.Create("output")
 ```
+
+</v-clicks>
+
 ---
 
 # Указатели
 
 ```go
-x := 1
-p := &x         // p, of type *int, points to x
-fmt.Println(*p) // "1"
-*p = 2          // equivalent to x = 2
-fmt.Println(x)  // "2"
+num := 1
+nump := &num        // nump, типа *int, указывает на num
+fmt.Println(*nump) // "1"
+*nump = 0          // эквивалентно num = 0
+fmt.Println(num)  // "0"
 ```
 
+<v-clicks>
 
+- `nump != nil` если `nump` ведет к переменной
+- два указателя равны если они ведут к одной переменой
 
 ```go
-var x, y int
-fmt.Println(&x == &x, &x == &y, &x == nil) // "true false false"
+var a, b int
+fmt.Println(&a == &a) // true
+fmt.Println(&a == &b) // false
+fmt.Println(&a == nil) // false
 ```
 
-
+</v-clicks>
 
 ---
 
 # Для функции безопасно возвращать указатель
 
 ```go
-var p = f()
+var p = get_p()
 
-func f() *int {
-    v := 1
-    return &v
+func get_p() *string {
+    val := "hello"
+    return &val
 }
 ```
 
-Переменная `v` инициализируется при каждом вызове функции `f()` в разных ячейках памяти:
+<v-clicks>
+
+Переменная `val` инициализируется при каждом вызове функции `get_p()` в разных ячейках памяти:
 
 ```go
-fmt.Println(f() == f()) // "false"
+p1 = get_p()
+p2 = get_p()
+fmt.Println(p1 == p2) // "false"
 ```
 
-
+</v-clicks>
 
 ---
 layout: two-cols
@@ -392,24 +391,18 @@ layout: two-cols
 # Пакет flag
 
 ```go
-// Echo4 prints its command-line arguments.
+// cmd.go
 package main
 
 import (
     "flag"
     "fmt"
-    "strings"
 )
 
-var n = flag.Bool("n", false, "omit trailing newline")
-var sep = flag.String("s", " ", "separator")
-
 func main() {
+    arg := flag.String("word", "", "a string")
     flag.Parse()
-    fmt.Print(strings.Join(flag.Args(), *sep))
-    if !*n {
-        fmt.Println()
-    }
+    fmt.Println(*arg)
 }
 ```
 
@@ -418,22 +411,18 @@ func main() {
 <div class="pt-16 pl-8">
 
 ```
-$ go build gopl.io/ch2/echo4
-$ ./echo4 a bc def
-a bc def
-$ ./echo4 -s / a bc def
-a/bc/def
-$ ./echo4 -n a bc def
-a bc def$
-$ ./echo4 -help
-Usage of ./echo4:
-  -n    omit trailing newline
-  -s string
-        separator (default " ")
+$ go build cmd.go
+$ ./cmd -word=hello
+hello
+$ ./cmd
+
+$ ./cmd -help
+Usage of ./cmd:
+  -word="": a string
 ```
 
-
 </div>
+
 ---
 
 # Функция new
@@ -447,10 +436,10 @@ Usage of ./echo4:
 # Пример
 
 ```go
-p := new(int)   // p, типа *int, указывает на безымянную переменную int
-fmt.Println(*p) // "0"
-*p = 2          // присваивает значение 2
-fmt.Println(*p) // "2"
+p := new(string)   // p, типа *string, указывает на безымянную переменную string
+fmt.Println(*p) // пустая строка
+*p = "hello"         // присваивает значение "hello"
+fmt.Println(*p) // "hello"
 ```
 
 ## Это всего лишь синтаксическое соглашение!
@@ -461,27 +450,32 @@ fmt.Println(*p) // "2"
 # Эти функции эквивалентны
 
 ```go
-func newInt() *int {
-    return new(int)
+func newString() *string {
+    return new(string)
 }
 ```
 
 ```go
-func newInt(){
-    var dummy int
-    return &dummy
+func newString(){
+    var emptyString string
+    return &emptyString
 }
 ```
+
+<v-clicks>
 
 ## Каждый вызов `new` возвращает отдельную переменную с новым адресом
 
 ```go
-p := new(int)
-q := new(int)
-fmt.Println(p == q) // "false"
+p1 := new(int)
+p2 := new(int)
+fmt.Println(p1 == p2) // "false"
 ```
 
-**Исключение**: две переменные нулевого размера и с пустым типом такие, как `struct` или `[]int` имеют одинаковый адрес.
+### Исключение
+Две переменные нулевого размера и с пустым типом такие, как `struct` или `[]int` имеют одинаковый адрес.
+
+</v-clicks>
 
 ---
 
@@ -492,24 +486,148 @@ fmt.Println(p == q) // "false"
 
 ---
 
-# Пример 1
+# Пример
 
 ```go
-for t := 0.0; t < cycles*2*math.Pi; t += res {
-    x := math.Sin(t)
-    y := math.Sin(t*freq + phase)
-    img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5),
-        blackIndex)
+nums := make(map[int]int)
+
+for i := 1; i < 10; i++ {
+    index := i - 1
+    nums[index] = i
 }
 ```
 
 <v-clicks>
 
-- Переменная `t` создается каждый раз, когда начинает исполняться цикл `for`
-- Переменные `x` и `y` создаются при каждой итерации
+- Переменная `i` создается каждый раз, когда начинает исполняться цикл `for`
+- Переменные `index` создается при каждой итерации
 - Переменная становится недоступной, когда не существует пути к ее значению
 
 </v-clicks>
+
+---
+
+# Выделение памяти
+
+Компилятор выделяет память для локальных переменных в стэке или в куче.
+
+```go
+var T *int
+
+func tie() {
+    var p int
+    p = 10
+    T = &p
+}
+```
+
+- `p` выделяется в куче потому, что она доступна из `T` после возврата `tie`
+
+```go
+func pure() {
+    x := new(int)
+    *x = 10
+    }
+```
+
+- `x` выделяется в стэке потому, что она недоступна после возврата `pure`
+---
+
+# Присваивания
+
+```go
+x = 10                       // именованная переменная
+*p = false                   // непрямая переменная
+country.city = "beijing"         // поле структуры
+nums[x] = nums[x] * coefficient // элемент массива, slice или map
+```
+
+Каждый арифметический и побитовый оператор имеет соответствующий _оператор присваивания_:
+
+```go
+nums[x] *= coefficient
+```
+
+## Инкременты и дикременты
+
+```go
+a := 1
+a++    // a = a + 1; a == 2
+a--    // a = a - 1; a == 1
+```
+
+---
+
+# Кортежные присваивания
+
+```go
+a, b = b, a
+```
+
+## Пример 1
+
+```go
+func GCD(a, b int) int {
+    for b != 0 {
+        a, b = b, a%b
+    }
+    return a
+}
+```
+
+## Пример 2
+
+```go
+func Fibonacci(n int) int {
+    a, b := 0, 1
+    for i := 0; i < n; i++ {
+        a, b = b, a+b
+    }
+    return a
+}
+```
+---
+---
+# Кортежные присваивания при вызове функций
+
+```go
+file, err = os.Open("report.md")  // функция возвращает два значения
+```
+
+Часто функции возвращают дополнительные значения: ошибку или булевый тип, отражающий результат.
+
+```go
+val, ok = vals[k]  // поиск в map
+val, ok = y.(T)   // проверка типа
+val, ok = <-ch    // получение канала
+```
+
+## Пустой идентификатор
+Ненужные значения можно отбросить
+
+```go
+_, err := io.WriteString(file, "hello") // отбросить количество записанных байтов
+_, ok = x.(T)                           // проверить тип, но отбросить результат
+```
+---
+
+# Неявыне присваивания
+
+```go
+colors := []string{"green", "red", "blue"}
+```
+
+# Явные присваивания
+
+```go
+colors[0] = "green"
+colors[1] = "red"
+colors[2] = "blue"
+```
+
+# Правило присваивания
+
+Присвоить значение переменной можно только если тип переменной совпадает со значением.
 
 ---
 layout: end
