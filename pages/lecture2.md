@@ -697,6 +697,31 @@ fmt.Println(m == Mile(k)) // true
 
 ---
 
+# Методы именованных типов
+
+```go
+func (m Mile) String() string {
+	return fmt.Sprintf("%g mi", m)
+}
+```
+
+- Именованные типы обладают поведением, которое можно программировать с помощью множества функций, называемых методами.
+- Метод `String` отвечает за строковое представление значения типа.
+
+---
+
+# Пример
+
+```go
+k := MToKM(10.0)
+fmt.Println(c.String()) // 16.09 km
+fmt.Printf("%v\n", c)   // 16.09 km; необязательно явно вызывать String
+fmt.Printf("%s\n", c)   // 16.09 km
+fmt.Println(c)          // 16.09 km
+fmt.Printf("%g\n", c)   // 16.09; не вызывает String
+fmt.Println(float64(c)) // 16.09; не вызывает String
+```
+
 ---
 layout: end
 ---
