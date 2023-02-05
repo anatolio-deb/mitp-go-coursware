@@ -1,5 +1,5 @@
 ---
-layout: cover
+layout: intro
 ---
 
 # Язык программирования Go

@@ -1,4 +1,7 @@
 ---
+src : ./pages/cover.md
+---
+---
 src : ./pages/contents.md
 ---
 ---
