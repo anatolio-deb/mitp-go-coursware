@@ -70,7 +70,7 @@ layout: intro
 
 # Полезные ссылки
 
-- Группа в Telegram
+- Канал в Telegram
 - Go Playground: [https://go.dev/play/](https://go.dev/play/)
 - Go talks: [https://go.dev/talks/](https://go.dev/talks/)
 - [https://yourbasic.org/](https://yourbasic.org/)
