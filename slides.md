@@ -1,4 +1,5 @@
 ---
+colorSchema: light
 src : ./pages/cover.md
 ---
 ---
@@ -9,4 +10,7 @@ src: ./pages/lecture1.md
 ---
 ---
 src: ./pages/lecture2.md
+---
+---
+src: ./pages/lecture3.md
 ---
