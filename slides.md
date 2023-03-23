@@ -17,3 +17,6 @@ src: ./pages/lecture3.md
 ---
 src: ./pages/lecture4.md
 ---
+---
+src: ./pages/lecture5.md
+---
