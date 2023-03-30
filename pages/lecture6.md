@@ -645,14 +645,14 @@ func (u User) ID() { return u.id }
 
 func (u User) SetID(id int) { u.id = id }
 
-func (u User) RemoveFriend(user User) { delete(u.Friends, user.ID)}
+func (u User) RemoveFriend(user User) { delete(u.friends, user.ID)}
 
-func (u User) AddFriend(user User) { u.Friends[user.ID] = user }
+func (u User) AddFriend(user User) { u.friends[user.ID] = user }
 
 func (u User) TotalRelations() int {
     var l int
     if u.friends != nil {
-        l := len(u.Friends)
+        l := len(u.friends)
     }
     if u.soulmate != nil {
         l += 1
