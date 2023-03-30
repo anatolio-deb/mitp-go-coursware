@@ -20,3 +20,6 @@ src: ./pages/lecture4.md
 ---
 src: ./pages/lecture5.md
 ---
+---
+src: ./pages/lecture6.md
+---
