@@ -86,7 +86,7 @@ func (u1 User) IsFriend(u2 User) bool {
 # Пример
 
 ```go
-u1 := User{ID: 1, Friends: make(map[int]*User)}
+u1 := User{ID: 1, Friends: make(map[int]User)}
 u2 := User{ID: 2}
 fmt.Println(u1.IsFriend(u2)) // false
 u1.Friends[u2.ID] = u2
