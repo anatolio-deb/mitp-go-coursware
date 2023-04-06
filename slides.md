@@ -1,5 +1,5 @@
 ---
-colorSchema: dark
+colorSchema: light
 src : ./pages/cover.md
 ---
 ---

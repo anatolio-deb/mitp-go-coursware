@@ -17,7 +17,7 @@ layout: section
 
 # Абстрактный пример
 
-```go
+```go{1-3|5-7|9-19|21-24||all}
 func APIFunction(c contract) error { // эта функция для внешних пользователей
 	return c.contractMethod()
 }
@@ -65,19 +65,21 @@ layout: fact
 
 ---
 
-# Постановка задачи
+# Задача
 
 - $z$ – условная единица.
 - $x$, $y$ - две валюты.
 - ${x}'$, ${y}'$ – стоимость (количество) $x$, $y$ по отношению к $z$.
--  ${x}''$, ${y}''$ – стоимость (количество) $z$ по отношению к $x$, $y$.
+- ${x}''$, ${y}''$ – стоимость (количество) $z$ по отношению к $x$, $y$.
 
 Выразить количество валюты $x$ в валюте $y$ и наоборот.
 
-## Алгоритм
+## Решение
 
 1. $a = x * {x}''$ – сколько $z$ (условных единиц) в количестве валюты $x$?
 2. $b = a * {y}'$ – сколько валюты $y$ в количестве $z$?
+
+Где ${x}'' = \frac{1z}{x'}$
 
 ---
 layout: section
@@ -87,103 +89,93 @@ layout: section
 
 ---
 
-# Попытка №1
-
 В качестве валюты $x$ возьмем Российский Рубль, в качестве валюты $y$ возьмем Японский Йен, а в качестве условной единицы $z$ - Доллар США.
 
-```go
-type usd struct { amount float64 }
-type rouble struct { amount float64 }
-type yen struct { amount float64 }
-```
-
-# Что плохо?
-
-<v-clicks>
-
-Если у структуры одно поле, то ее можно заменить типом.
-
-</v-clicks>
-
----
-
-# Попытка №2
-
-И Рубль и Йены должны поддерживать выражение в Доллары, чтобы удовлетворять условию $x\to y\to x$.
-
-```go
-type usd float64
-type rouble float64
-type yen float64
-
-func (r rouble) toUSD() usd { return usd(r * 0.012) }
-func (y yen) toUSD() usd { return usd(y * 0.0076) }
-```
-
-## Что плохо?
-
-<v-clicks>
-
-- Нужны ли типы с одинаковыми нижележащими типами?
-- Почему не использовать просто float64?
-
-</v-clicks>
-
----
-
-# Попытка №3
-
-```go
-// Конвертирует количество любой валюты в условные единицы.
-// usd - стоимость (количество) условных единиц по отношению к amount
-func toUSD(amount float64, usd float64) float64 {
-	return amount * usd
+```go{1|2-5|6-11|all}
+type USD float64
+type Currency struct {
+	Amount float64
+	Rate   USD
 }
-
-func main() {
-	usdFromRouble := toUSD(80, 0.012)
-	fmt.Println(usdFromRouble) // 0.96
-	usdFromYen := toUSD(130, 0.0076)
-	fmt.Println(usdFromYen) // 0.988
+type Rouble struct {
+	Currency
+}
+type Yen struct {
+	Currency
 }
 ```
 
-# Что плохо?
-
-<v-clicks>
-
-Плохой API, непонятные параметры, необходимость документации.
-
-</v-clicks>
+<!-- Почему usd не структура, а тип?
+Потому что у условной единицы не может быть rate. Остается единственное поле amount, а структуру с одним полем лучше представить как тип.
+ -->
 
 ---
 layout: two-cols
 ---
 
-# Попытка №4
+```go{12-25}
+type USD float64
+type Currency struct {
+	Amount float64
+	Rate   USD
+}
+type Rouble struct {
+	Currency
+}
+type Yen struct {
+	Currency
+}
+
+func (c Currency) ToUSD() USD {
+	if c.Amount == 0 {
+		c.Amount++
+	}
+	return USD(c.Amount * float64((USD(1) / c.Rate)))
+}
+```
+
+::right::
 
 ```go
-type currency struct {
-	amount float64 // количество валюты
-	rate   float64 // стоимость одной условной единицы в валюте
+func main() {
+	y := Yen{Currency{Rate: USD(131.23)}}
+	r := Rouble{Currency{Rate: USD(80.20)}}
+	fmt.Println(y.ToUSD()) // 0.007620208793720948
+	fmt.Println(r.ToUSD()) // 0.012468827930174562
 }
-type rouble struct{ currency }
-type yen struct{ currency }
+```
 
-func (r rouble) toUSD() float64 { return r.amount * 0.012 }
+И Рубль и Йены должны поддерживать выражение в Доллары, чтобы удовлетворять условию $x\to y\to x$.
 
-func (y yen) toUSD() float64 { return y.amount * 0.0076 }
+---
+layout: two-cols
+---
 
-func convert(from rouble, to yen) float64 {
-	return from.toUSD() * to.rate
+<img src="Screenshot 2023-04-06 at 05.27.36.png"/>
+
+::right::
+
+<img src="Screenshot 2023-04-06 at 05.27.49.png"/>
+
+---
+layout: two-cols
+---
+
+# API
+
+```go
+func Convert(from Rouble, to Yen) float64 {
+	return float64(from.ToUSD() * to.Rate)
 }
 
 func main() {
-	r := rouble{currency{1, 80.19}}
-	y := yen{currency{rate: 130.88}}
-	fmt.Println(convert(r, y)) // 1.57056
+	r := Rouble{Currency{Rate: 80.19}}
+	y := Yen{Currency{Rate: 130.88}}
+	fmt.Println(Convert(r, y)) // 1.6321237061977802
 }
 ```
+
+<img src="Screenshot 2023-04-06 at 06.29.53.png">
 
 ::right::
 
@@ -191,66 +183,67 @@ func main() {
 
 <v-clicks>
 
-- Функция convert не универсальна
+- Функция Convert не универсальна
 - Больше валют = больше функций = сложнее API
 - Если есть две структуры с одинаковым методом, значит над ними может быть абстрактный тип (интерфейс)
 
 </v-clicks>
 
 ---
+layout: two-cols
+---
 
-# Попытка №5
+```go{12|21-23|25-27|all}
+type USD float64
+type Currency struct {
+	Amount float64
+	Rate   USD
+}
+type Rouble struct {
+	Currency
+}
+type Yen struct {
+	Currency
+}
+type Exchangable interface{ ToUSD() USD }
+
+func (c Currency) ToUSD() USD {
+	if c.Amount == 0 {
+		c.Amount++
+	}
+	return USD(c.Amount * float64((USD(1) / c.Rate)))
+}
+
+func (u USD) ToCurrency(c Currency) float64 {
+    return float64(u * c.Rate)
+    }
+
+func Convert(from Exchangable, to Currency) float64 {
+	return from.ToUSD().ToCurrency(to)
+}
+```
+
+::right::
 
 ```go
-type currency struct {
-	amount float64
-	rate   float64
-}
-type rouble struct{ currency }
-type yen struct{ currency }
-type convertable interface{ toUSD() usd }
-type usd float64
-
-func (u usd) toCurrency(c currency) float64 { return float64(u) * c.rate }
-
-func (r rouble) toUSD() usd { return usd(r.amount * 0.012) }
-
-func (y yen) toUSD() usd { return usd(y.amount * 0.0076) }
-
-func convert(from convertable, to currency) float64 {
-	return from.toUSD().toCurrency(to)
-}
-
 func main() {
-	fmt.Println(convert(yen{currency{amount: 1}}, rouble{currency{rate: 80.20}}.currency)) // 0.6095200000000001
+	y := Yen{Currency{Rate: 131.23}}
+	r := Rouble{Currency{Rate: 80.20}}
+	fmt.Println(Convert(y, r.Currency)) // 0.61114074525642
 }
 ```
+
+[https://go.dev/play/p/lWwbeZd-tpN](https://go.dev/play/p/lWwbeZd-tpN)
 
 <!-- 
-1. usd необязательно быть структурой
-2. convertable – это контракт между функцией convert и ее пользователями
-3. По "контракту функция convert ожидает тип с методом toUSD
-4. Функции convert без разницы как реализован конкретный toUSD
+1. USD необязательно быть структурой
+2. Exchangable – это контракт между функцией Convert и ее пользователями
+3. По "контракту" функция Convert ожидает тип с методом ToUSD
+4. Функции Convert без разницы как реализован конкретный ToUSD
 5. API не зависит от количества валют
+6. Rouble и Yen тоже Exchangable
 -->
 
----
-
-## Вывод
-
-```text
-0.6095200000000001
-```
-
----
-
-<img src="Screenshot 2023-04-06 at 03.30.49.png"/>
-
----
-layout: fact
----
-
-[https://go.dev/play/p/8ae38ReQzuc](https://go.dev/play/p/8ae38ReQzuc)
 
 ---
 layout: end
