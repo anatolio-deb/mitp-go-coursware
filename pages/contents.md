@@ -9,6 +9,8 @@ layout: full
 - <Link to="135">4. Составные типы данных</Link>
 - <Link to="209">5. Функции</Link>
 - <Link to="267">6. Методы</Link>
+- <Link to="304">7. Интерфейсы</Link>
+
 
 
 
