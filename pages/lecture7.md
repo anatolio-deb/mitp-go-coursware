@@ -11,7 +11,7 @@ layout: intro
 layout: section
 ---
 
-# Интерфейсы как Контракты
+# Интерфейсы как контракты
 
 ---
 
@@ -50,87 +50,106 @@ func main() {
 layout: section
 ---
 
-## Конкретный пример: конвертер валют
+## Конкретный пример: стоимость недвижимости
 
 ---
-layout: fact
+layout: two-cols
 ---
 
-Все валюты выражаются через условные единицы.
+```go{1|2|3|4,10-12|5-8,14-20|22-24|all}
+const AveragePrice int = 5000
+type Value interface{ Price() int }
+type RealEstate struct { Rooms int }
+type Condominium struct { RealEstate }
+type SingleFamilyHome struct {
+	RealEstate
+	Garage bool
+}
 
-<!--
-1. Можно выражать одни валюты через другие благодаря общему курсу.
-2. Условная единица – универсальная единица оценивания других валют.
--->
+func (c Condominium) Price() int {
+	return c.Rooms * 1000
+}
 
----
+func (s SingleFamilyHome) Price() int {
+	p := s.Rooms * 1000
+	if s.Garage {
+		p += 1000
+	}
+	return p
+}
 
-# Задача
+func Valuate(v Value) int {
+	return v.Price() * rand.Intn(AveragePrice)
+}
+```
 
-- $z$ – условная единица.
-- $x$, $y$ - две валюты.
-- ${x}'$, ${y}'$ – стоимость (количество) $x$, $y$ по отношению к $z$.
-- ${x}''$, ${y}''$ – стоимость (количество) $z$ по отношению к $x$, $y$.
+::right::
 
-Выразить количество валюты $x$ в валюте $y$ и наоборот.
+```go
+func main() {
+	c := Condominium{RealEstate{Rooms: 3}}
+	fmt.Println(c.Price()) // 3000
+	s := SingleFamilyHome{
+		RealEstate: RealEstate{
+			Rooms: 3
+			},
+		Garage: true
+		}
+	fmt.Println(s.Price())  // 4000
+	fmt.Println(Valuate(c)) // 14877000
+	fmt.Println(Valuate(s)) // 6296000
+}
+```
 
-## Решение
+<v-clicks>
 
-1. $a = x * {x}''$ – сколько $z$ (условных единиц) в количестве валюты $x$?
-2. $b = a * {y}'$ – сколько валюты $y$ в количестве $z$?
+- Метод Price – это контракт (договоренность) между конкретными структурами и Valuate.
+- Все, что реализует метод Price, может быть оценено __независимо__ от алгоритма.
+- Функции Valuate все равно, какой алгоритм реализует структура.
 
-Где ${x}'' = \frac{1z}{x'}$
+</v-clicks>
+
+<!-- The idea: estimate a real estate market price
+1. Average price among all types of real estate
+2. Price() is a contract -->
 
 ---
 layout: section
 ---
 
-# Реализация
-
----
-
-В качестве валюты $x$ возьмем Российский Рубль, в качестве валюты $y$ возьмем Японский Йен, а в качестве условной единицы $z$ - Доллар США.
-
-```go{1|2-5|6-11|all}
-type USD float64
-type Currency struct {
-	Amount float64
-	Rate   USD
-}
-type Rouble struct {
-	Currency
-}
-type Yen struct {
-	Currency
-}
-```
-
-<!-- Почему usd не структура, а тип?
-Потому что у условной единицы не может быть rate. Остается единственное поле amount, а структуру с одним полем лучше представить как тип.
- -->
+# Сигнатура контракта
 
 ---
 layout: two-cols
 ---
 
-```go{12-25}
-type USD float64
-type Currency struct {
-	Amount float64
-	Rate   USD
-}
-type Rouble struct {
-	Currency
-}
-type Yen struct {
-	Currency
+```go{1|2|4|11-21|22-27|all}
+const CAP int = 3000
+const SFHAP int = 6000
+
+type Value interface{ Price(factor int) int }
+type RealEstate struct { Rooms int }
+type Condominium struct { RealEstate }
+type SingleFamilyHome struct {
+	RealEstate
+	Garage bool
 }
 
-func (c Currency) ToUSD() USD {
-	if c.Amount == 0 {
-		c.Amount++
+func (c Condominium) Price(factor int) int {
+	return (c.Rooms * 1000) * factor
+}
+
+func (s SingleFamilyHome) Price(factor int) int {
+	p := s.Rooms * 1000
+	if s.Garage {
+		p += 1000
 	}
-	return USD(c.Amount * float64((USD(1) / c.Rate)))
+	return p * factor
+}
+
+func Valuate(v Value, averagePrice int) int {
+	factor := rand.Intn(averagePrice)
+	return v.Price(factor)
 }
 ```
 
@@ -138,111 +157,270 @@ func (c Currency) ToUSD() USD {
 
 ```go
 func main() {
-	y := Yen{Currency{Rate: USD(131.23)}}
-	r := Rouble{Currency{Rate: USD(80.20)}}
-	fmt.Println(y.ToUSD()) // 0.007620208793720948
-	fmt.Println(r.ToUSD()) // 0.012468827930174562
+	c := Condominium{RealEstate{Rooms: 3}}
+	s := SingleFamilyHome{
+		RealEstate: RealEstate{
+			Rooms: 5,
+		},
+	}
+	fmt.Println(Valuate(c, CAP)) // 6900000
+	fmt.Println(Valuate(s, SFHAP)) // 16030000
 }
 ```
 
-И Рубль и Йены должны поддерживать выражение в Доллары, чтобы удовлетворять условию $x\to y\to x$.
+<!--
+1. Distinct average price for Condominiums
+2. Distinct average price for Family Houses
+3. New contract signature: factor affects the price
+4. Methods now implements contract signature
+5. API still the same, but implementation differs
+-->
+
+---
+layout: section
+---
+
+# Типы интерфейсов
 
 ---
 layout: two-cols
 ---
 
-<img src="Screenshot 2023-04-06 at 05.27.36.png"/>
+```go{1|3|4|5-8|9|11-13|15-17|19-21|all}
+const AveragePrice int = 10000
+
+type Value interface{ Price() int }
+type Seller interface { Sell(v Value) }
+type ValueSeller interface {
+	Value
+	Seller
+}
+type Agency struct { Income int }
+
+func (a *Agency) Sell(v Value) {
+	a.Income += Valuate(v)
+}
+
+func (a Agency) Price() int {
+	return a.Income * 2
+}
+
+func Valuate(v Value) int {
+	return v.Price() * rand.Intn(AveragePrice)
+}
+```
 
 ::right::
-
-<img src="Screenshot 2023-04-06 at 05.27.49.png"/>
-
----
-layout: two-cols
----
-
-# API
 
 ```go
-func Convert(from Rouble, to Yen) float64 {
-	return float64(from.ToUSD() * to.Rate)
-}
-
 func main() {
-	r := Rouble{Currency{Rate: 80.19}}
-	y := Yen{Currency{Rate: 130.88}}
-	fmt.Println(Convert(r, y)) // 1.6321237061977802
+	s := SingleFamilyHome{
+		RealEstate: RealEstate{
+			Rooms: 5,
+		},
+	}
+	a := Agency{}
+	a.Sell(s) // продали дом
+	fmt.Println(Valuate(a)) // 89389740000
 }
+
 ```
-
-<img src="Screenshot 2023-04-06 at 06.29.53.png">
-
-::right::
-
-# Что плохо?
 
 <v-clicks>
 
-- Функция Convert не универсальна
-- Больше валют = больше функций = сложнее API
-- Если есть две структуры с одинаковым методом, значит над ними может быть абстрактный тип (интерфейс)
+- Встраивание интерфейсов удобно применять для того, чтобы не описывать множество методов больших интерфейсов.
 
 </v-clicks>
 
+<!-- 1. We have average price again.
+2. Seller is a traditional definition of interfaces followed by stdlib style
+3. ValueSeller is an example of interface embedding. It can be done by specifying methods implicitly too.
+4. Agency is a Value Seller
+5. Agency implements a Sell contract of Seller interface
+6. Agency implements a Price contract of a Value interface 
+7. We can Valuate a price of Agency too-->
+
 ---
-layout: two-cols
----
 
-```go{12|21-23|25-27|all}
-type USD float64
-type Currency struct {
-	Amount float64
-	Rate   USD
-}
-type Rouble struct {
-	Currency
-}
-type Yen struct {
-	Currency
-}
-type Exchangable interface{ ToUSD() USD }
-
-func (c Currency) ToUSD() USD {
-	if c.Amount == 0 {
-		c.Amount++
-	}
-	return USD(c.Amount * float64((USD(1) / c.Rate)))
-}
-
-func (u USD) ToCurrency(c Currency) float64 {
-    return float64(u * c.Rate)
-    }
-
-func Convert(from Exchangable, to Currency) float64 {
-	return from.ToUSD().ToCurrency(to)
-}
-```
-
-::right::
+# Другие способы встраивания
 
 ```go
-func main() {
-	y := Yen{Currency{Rate: 131.23}}
-	r := Rouble{Currency{Rate: 80.20}}
-	fmt.Println(Convert(y, r.Currency)) // 0.61114074525642
+type Value interface{ Price() int }
+type Seller interface { Sell(v Value) }
+type ValueSeller interface {
+	Price() int
+	Sell(v Value)
 }
 ```
 
-[https://go.dev/play/p/lWwbeZd-tpN](https://go.dev/play/p/lWwbeZd-tpN)
+## Частичное встраивание
 
-<!-- 
-1. USD необязательно быть структурой
-2. Exchangable – это контракт между функцией Convert и ее пользователями
-3. По "контракту" функция Convert ожидает тип с методом ToUSD
-4. Функции Convert без разницы как реализован конкретный ToUSD
-5. API не зависит от количества валют
-6. Rouble и Yen тоже Exchangable
+```go
+type ValueSeller interface {
+	Price() int
+	Seller
+}
+```
+
+---
+layout: section
+---
+
+# Соответствие интерфейсу
+
+---
+layout: fact
+---
+
+Тип _соответствует_ интерфейсу если он обладает всеми методами интерфейса
+
+---
+
+# Правило
+
+Выражение может быть присвоено интерфейсу только если его тип соответствует интерфейсу.
+
+```go
+type Seller interface { Sell(v Value) }
+type Agent struct{ InterestIncome int }
+
+func (a *Agent) Sell(v Value) {
+	a.InterestIncome += Valuate(v) / 10
+}
+
+var v Value
+v = SingleFamilyHome{} // ОК: у SingleFamilyHome есть метод Price
+v = new(Agency)        // ОК: у Agency есть метод Price
+v = Agent{}            // Error: у Agent нет метода Price
+
+var vs ValueSeller
+vs = &Agency{} // OK: у Agency есть методы Price и Sell
+vs = Agent{}   // Error: у Agent нет метода Price
+```
+
+Работает даже когда тип присваиваемого значения – интерфейс.
+
+```go
+v = vs // OK: у Agency есть метод Price
+vs = v // Error: у Value нет метода Sell
+```
+
+---
+layout: section
+---
+
+# Напоминание
+
+---
+layout: fact
+---
+
+На каждом конкретном типе T могут быть определены как методы с ресивером типа T, так и методы с ресивером типа *T
+
+---
+layout: fact
+---
+
+Можно вызывать метод *T на аргументе типа T до тех пор, пока этот аргумент является _переменной_
+
+<!-- Это синтаксический сахар: компилятор получает адрес самостоятельно -->
+
+---
+
+
+# Пример
+
+```go{3-5|7|8-10|all}
+type Seller interface{ Sell(v Value) }
+type Agency struct{ Income int }
+
+func (a *Agency) Sell(v Value) {
+	a.Income += Valuate(v)
+}
+
+var _ = Agency{}.Sell(SingleFamilyHome{}) // Error: Sell требует ресивер *Agency
+var a Agency
+a.Sell(SingleFamilyHome{})
+fmt.Println(a.Income) // 0
+```
+
+<v-clicks>
+
+Поскольку метод Sell есть у *Agency, только *Agency соответствует интерфейсу Seller
+
+```go
+var _ Seller = &a // OK
+var _ Seller = a // Error: у Agency нет метода Sell
+```
+
+</v-clicks>
+
+<!--
+1. Метод Sell принимает указатель на ресивер.
+2. Компилятор не может вызвать метод на переменной без адреса.
+3. Но его можно вызвать на переменной.
 -->
+
+---
+
+Интерфейс оборачивает и скрывает конкретный тип и значение, которое он содержит. 
+
+Вызывать можно только методы, которые раскрывает интерфейс, даже если у конкретного типа есть другие методы.
+
+```go
+var a = Agency{}
+a.Sell(SingleFamilyHome{}) // OK: у *ValueSeller есть метод Sell 
+a.Price() // OK: у *ValueSeller есть метод Price 
+
+var s Seller
+s = &Agency{}
+s.Sell(SingleFamilyHome{}) // OK: у Seller есть метод Sell 
+s.Price() // Error: у Seller нет метода Price
+```
+
+---
+layout: section
+---
+
+# Пустой интерфейс
+
+---
+layout: fact
+---
+
+Чем больше методов в интерфейсе, тем больше требований к типам, которые его реализуют.
+
+---
+
+# Пустой интерфейс не требует от типов ничего
+
+Поэтому пустому интерфейсу можно присвоить любое значение
+
+```go
+var any interface{}
+any = false
+any = 24.0
+any = "hello world"
+any = []int{1,2,3,4,5}
+any[0]++ // Error: нет прямого доступа к значению в пустом интерфейсе потому, что у него нет методов
+```
+
+# Usage из стандартной библиотеки
+
+[https://pkg.go.dev/fmt#Println](https://pkg.go.dev/fmt#Println)
+
+```go
+func Println(a ...any) (n int, err error)
+```
+
+[https://pkg.go.dev/fmt#Errorf](https://pkg.go.dev/fmt#Errorf)
+
+```go
+func Errorf(format string, a ...any) error
+```
+
+---
+
 
 
 ---
