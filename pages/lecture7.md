@@ -330,7 +330,7 @@ layout: fact
 
 # Пример
 
-```go{3-5|7|8-10|all}
+```go{4-5|8|9-11|all}
 type Seller interface{ Sell(v Value) }
 type Agency struct{ Income int }
 
@@ -420,8 +420,218 @@ func Errorf(format string, a ...any) error
 ```
 
 ---
+layout: section
+---
 
+# Значение интерфейса
 
+---
+
+# Идея
+
+Значение интерфейса составляют две компоненты:
+
+- конкретный тип (динамический тип)
+- значение этого типа (динамическое значение)
+
+---
+layout: fact
+---
+
+Компонента типа интерфейса представлена _дескриптором типа_, то есть тем, значением, которое описывает тип (его имя, методы и т.п).
+
+---
+
+# Пример
+
+```go
+var s Seller
+s = &Agent{}
+s.Sell(SingleFamilyHome{})
+s = new(Agency)
+s = nil
+```
+
+<!--  1. У Seller есть метод Sell
+2. У Agent и Agency есть методы Sell, поэтому их можно присвоить типу Seller. -->
+
+---
+
+# Нулевое значение интерфейса
+
+```go
+var s Seller
+s = nil
+```
+
+<img src="/public/Untitled drawing (11).png" />
+
+Определение значения интерфейса как нулевого или отличного от нулевого определяется по его динамическому типу.
+
+---
+
+# Указатель на тип как значение интерфейса
+
+```go
+s = &Agent{}
+```
+
+<img src="/public/Untitled drawing (16).png"/>
+
+Присваивание выше – это неявное преобразование типа:
+
+```go
+s = Seller(&Agent{})
+```
+
+- динамический тип интерфейса принимает дескриптор типа указателя *Agent
+- динамическое значение интерфейса принимает копию указателя на Agent
+
+---
+
+## Как происходит вызов метода типа на интерфейсе?
+
+```go
+s.Sell(SingleFamilyHome{})
+```
+
+Вызов метода Sell на значении интерфейса, содержащего указатель *Agent, влечет вызов метода (*Agent).Sell.
+
+Компилятор использует динамическую отправку (dynamic dispatch) чтобы сгенерировать код, возвращающий адрес метода Sell из дескриптора типа, затем делает непрямой вызов по этому адресу. В качестве ресивера тогда выступает копия динамического значения интерфейса – Agent. Эффект такой, как если бы мы делали прямой вызов (в данном случае брали бы адрес ресивера явно):
+
+```go
+(&Agent{}).Sell(SingleFamilyHome{})
+```
+
+_Здесь указан непрямой вызов, так как методу Agent.Sell нужен указатель на ресивер._
+
+---
+
+Для типов, которые имеют прямой доступ к ресиверу, это выглядит так:
+
+```go{7}
+type Seller interface{ Sell(v Value) int }
+type Agent struct{}
+func (a Agent) Sell(v Value) int {
+	return Valuate(v) / 10
+}
+
+Agent{}.Sell(SingleFamilyHome{})
+```
+
+---
+
+# Тип как значение интерфейса
+
+```go
+var s Value
+s = SingleFamilyHome{RealEstate: RealEstate{Rooms:4}}
+```
+
+<img src="/public/Untitled drawing (17).png"/>
+
+---
+layout: fact
+---
+
+Два интерфейса равны, если у них один динамический тип, а их динамические значения равны согласно операции == определенной на этом типе. 
+
+---
+
+# Интерфейсы можно сравнивать не всегда
+
+```go
+var x interface{} = func() {}
+fmt.Println(x == x) // panic: runtime error: comparing uncomparable type func()
+```
+
+Сравнивайте интерфейсы только, когда вы уверены, что их динамические значение содержат сравниваемые типы.
+
+<!-- Их нельзя сравнивать, если их динамические значения содержат не сравниваемый тип. -->
+
+---
+layout: section
+---
+
+# Утверждение типов
+
+---
+layout: fact
+---
+
+Утверждение типа (type assertion) – это операция вида x.(T) на значении интерфейса, где x – выражение типа интерфейса, T – тип, называемый «утверждаемым» типом. 
+
+---
+
+# Утверждение конкретного типа
+
+Проверяет, что динамический тип интерфейса x соответствует типу T.
+
+```go
+var s Seller
+s = &Agent{}
+a := s.(*Agent) // возвращает динамическое значение x типа *Agent
+fmt.Printf("%T\n", a) // *Agent
+b := s.(*Agency)      // panic: interface conversion: main.Seller is *main.Agent, not *main.Agency
+fmt.Printf("%T\n", b)
+```
+
+---
+
+# Утверждение типа интерфейса
+
+Проверяет, что динамический тип x соответствует T.
+
+```go
+var s Seller
+s = &Agency{}
+vs := s.(ValueSeller) // возвращает интерфейс с типом ValueSeller
+fmt.Printf("%T\n", vs) // *main.Agency
+s = new(Agent)
+vs = s.(ValueSeller) // panic: interface conversion: *main.Agent is not main.ValueSeller: missing method Price
+```
+
+---
+
+# Утверждение типа без паники
+
+```go
+var s Seller = &Agent{}
+agent, ok := s.(*Agent) // ok, a == Agent
+agency, ok = s.(*Agency) // !ok, a == nil
+```
+
+# Usage
+
+```go
+if a, ok := s.(*Agent); ok {
+	a.Sell(SingleFamilyHome{})
+}
+```
+
+---
+
+# Типы, switch и пустой интерфейс
+
+```go
+func do(i interface{}) {
+	switch v := i.(type) {
+	case int:
+		fmt.Printf("Twice %v is %v\n", v, v*2)
+	case string:
+		fmt.Printf("%q is %v bytes long\n", v, len(v))
+	default:
+		fmt.Printf("I don't know about type %T!\n", v)
+	}
+}
+```
+
+---
+
+# Дополнительно
+
+- [Dynamic dispatch](https://en.wikipedia.org/wiki/Dynamic_dispatch#:~:text=In%20computer%20science%2C%20dynamic%20dispatch,(OOP)%20languages%20and%20systems.)
+- [https://github.com/teh-cmc/go-internals](https://github.com/teh-cmc/go-internals/blob/master/chapter2_interfaces/README.md)
 
 ---
 layout: end
