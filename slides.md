@@ -1,5 +1,5 @@
 ---
-colorSchema: light
+colorSchema: auto
 src : ./pages/cover.md
 ---
 ---
@@ -25,4 +25,7 @@ src: ./pages/lecture6.md
 ---
 ---
 src: ./pages/lecture7.md
+---
+---
+src: ./pages/lecture8.md
 ---
