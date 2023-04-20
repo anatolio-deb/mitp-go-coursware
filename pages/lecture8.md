@@ -1,3 +1,4 @@
+<!-- TODO: cancellation chapter -->
 ---
 layout: intro
 ---
@@ -120,7 +121,7 @@ func getRandomFact() FactResponse {
 
 # Запуск сервера
 
-```go{all|12}
+```go{2|12|all}
 func main() {
 	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%v", "localhost", 3000))
 	if err != nil {
@@ -137,8 +138,10 @@ func main() {
 }
 ```
 
-<!-- Этот сервер обрабатывает запросы последовательно.
-Что значит последовательно? -->
+<!--
+1. Что такое net.Listen и почему не http.ListenAndServe?
+2. Этот сервер обрабатывает запросы последовательно. Что значит последовательно? 
+-->
 
 ---
 
@@ -167,7 +170,7 @@ layout: section
 
 # Подключение
 
-```go{1|2|5|15|all}
+```go{1|2|5|6|15|all}
 var facts = make(chan string, 100)
 var wg sync.WaitGroup
 
@@ -192,14 +195,15 @@ func Connect(address string, port int) {
 
 2. WaitGroup ждет завершения группы горутин. Подробнее на след. слайдах.
 3. Функция Connect – это горутина, имитирующая отдельного пользователя. wg.Done – сообщает WaitGroup, что горутина завершилась, поэтому вызывается в defer последней инструкцией в горутине. defer выполняются в порядке FILO.
-4. Отправляем факт в канал.
+4. Как работает Dial?
+5. Отправляем факт в канал.
 -->
 
 ---
 
 # Запуск клиента
 
-```go{4|5|6|8|all}
+```go{4|5|6|9|all}
 func main() {
 	now := time.Now()
 
@@ -391,7 +395,7 @@ layout: section
 
 Каналы можно использовать для соединения горутин таким образом, что вывод одной горутины является вводом другой.
 
-<img class="px-48" src="public/pipeline.png"/>
+<img class="px-48" src="/public/pipeline.png"/>
 
 ---
 
@@ -418,6 +422,7 @@ func main() {
 	for {
 		fmt.Print(<-chars)
 	}
+	fmt.Print("\n")
 }
 ```
 
@@ -454,6 +459,7 @@ func main() {
 	for i := range chars { // можно итерировать по каналу
 		fmt.Print(i)
 	}
+	fmt.Print("\n")
 }
 ```
 
@@ -527,6 +533,7 @@ func printer(in <-chan string) {
 	for i := range in {
 		fmt.Print(i)
 	}
+	fmt.Print("\n")
 }
 ```
 
@@ -549,6 +556,158 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZ
 ```
 
 При передачи канала в функцию, его тип неявно конвертируется в тип параметра функции.
+
+---
+layout: section
+---
+
+# Буферизированные каналы
+
+---
+layout: fact
+---
+
+Буферизированный каналы – это очередь FIFO.
+
+---
+
+# Пустой буферезированный канал
+
+```go
+ch := make(chan, int, 3)
+```
+
+<img class="px-48" src="/public/Untitled drawing (1).png"/>
+
+<!-- 
+Отправка в канал вставляет элемент в конец очереди, а получение из канал удаляет элемент из начала.
+-->
+
+---
+
+# Отправка в канал
+
+```go
+ch <- 1
+ch <- 2
+ch <- 3
+ch <- 4 // заблокирует горутину
+```
+
+<img class="px-48" src="/public/channel-full.png"/>
+
+<!-- 
+Если канал полон, то отправка в канал блокирует отправляющую горутину до тех пор, пока другая горутина не освободит место в канале операцией получения.
+
+Если канал пустой, то операция получения блокирует получающую горутину до тех пор, пока другая горутина не отправит в канал.
+-->
+
+---
+
+# Получение из канала
+
+```go
+fmt.Println(ch<-) // 1
+fmt.Println(cap(ch)) // 3
+fmt.Println(len(ch)) // 2
+```
+
+<img class="px-48" src="/public/channel-full-partially.png" />
+
+---
+layout: fact
+---
+
+Не используйте каналы как очередь в одной горутине. Если вам нужна структура данных очередь, используйте slice. Каналы нужны для синхронизаци горутин.
+
+---
+layout: section
+---
+
+# Мультиплексирование select
+
+---
+
+# Пример
+
+```go{1-8|11-23|all}
+func fib1(n int, results chan<- int) int {
+	if n < 2 {
+		return n
+	}
+	r := fib1(n-1, results) + fib1(n-2, results)
+	results <- r
+	return r
+}
+
+// fib2 использует кэш для оптимизации рекурсивных вызовов.
+func fib2(n int, cache map[int]int, results chan<- int) int {
+	r, ok := cache[n]
+
+	if ok {
+		return r
+	}
+
+	if n < 2 {
+		return n
+	}
+	cache[n] = fib2(n-1, cache, results) + fib2(n-2, cache, results)
+	results <- cache[n]
+	return cache[n]
+}
+```
+
+---
+layout: two-cols
+---
+
+```go{2|3-6|9,10,18,26|11-17,19-25|all}
+func main() {
+	const fibOf43 int = 433494437 // до каких пор считать
+	res1, res2 := make(chan int, 43), make(chan int, 43)
+	cache := make(map[int]int)
+	go fib1(43, res1)
+	go fib2(43, cache, res2)
+	fmt.Println("the winner is:")
+	for {
+		select {
+		case x, ok := <-res1:
+			if !ok {
+				fmt.Println("fib1")
+				return
+			}
+			if x == fibOf43 {
+				close(res1)
+			}
+		case x, ok := <-res2:
+			if !ok {
+				fmt.Println("fib2")
+				return
+			}
+			if x == fibOf43 {
+				close(res2)
+			}
+		}
+	}
+}
+```
+
+::right::
+
+```text
+the winner is:
+fib2
+```
+
+<!-- 
+1. Верхняя граница последовательности
+2. Канал для горутины fib1
+3. Канал и кэш для горутины fib2
+4. select работает как switch, но с каналами. Он ждет кагда какой либо канал в кейсе освободится для коммуникации, и тогда выполняет тело кейса. ok – это флаг, чтобы проверить закрыт/заполнен канал или нет. Если закрыт/заполнен, то ok == false
+5. Если !ok значит, канал уже закрыт, значит нужное значение было уже получено. Если ok, значит канал еще открыт для записи, горутина работает, продолжать искать нужное значение. Если нужно значение найдено, значит горутина завершила свою работу, канал можно закрыть. На следующей итерации выход из цикла.
+6. Горутины заполняют свои каналы, а select ждет, когда там появится определенное значение.
+-->
+
 
 ---
 layout: end
