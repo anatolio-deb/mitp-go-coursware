@@ -29,3 +29,6 @@ src: ./pages/lecture7.md
 ---
 src: ./pages/lecture8.md
 ---
+---
+src: ./pages/lecture9.md
+---

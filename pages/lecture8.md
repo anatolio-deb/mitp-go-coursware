@@ -1,4 +1,3 @@
-<!-- TODO: cancellation chapter -->
 ---
 layout: intro
 ---
@@ -6,7 +5,9 @@ layout: intro
 # Язык программирования Go
 ## Горутины и каналы
 ### Анатолий Никифоров, МФТИ, 2023
-#### Лекция 9
+#### Лекция 8
+
+<!-- TODO: cancellation chapter -->
 
 ---
 layout: section
