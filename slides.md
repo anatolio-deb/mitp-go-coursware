@@ -32,3 +32,9 @@ src: ./pages/lecture8.md
 ---
 src: ./pages/lecture9.md
 ---
+---
+src: ./pages/lecture10.md
+---
+---
+src: ./pages/lecture11.md
+---

@@ -734,3 +734,11 @@ func (p player) Put(i item, q int) {
 ---
 layout: end
 ---
+
+<!-- TODO: “9.8 Goroutines and Threads”
+
+Excerpt From
+The Go Programming Language
+Brian W. Kernighan
+https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewBook?id=0
+This material may be protected by copyright. -->
