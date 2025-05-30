@@ -3,7 +3,7 @@ layout: cover
 ---
 
 # Язык программирования Go
-## Анатолий Никифоров, МФТИ, 2023
+## Анатолий Никифоров, OTUS, 2025
 
 &nbsp;
 <img src="Golang-logo-005.svg" alt="drawing" width="200"/>
