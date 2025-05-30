@@ -11,13 +11,13 @@ layout: intro
 
 # Обо мне
 <div class="flex">
-    <img src="/IMG_2194.jpg" class="mx-10 h-40 rounded shadow flex-col"/>
+    <img src="/1000003217.png" class="mx-10 h-40 rounded shadow flex-col"/>
     <div class="flex-col">
         <ul>
             <li> Бакалавр компьютерной инженерии, ХНУРЭ, 2015</li>
-            <li> Lead Go Engineer at ForestVPN: <a href="https://forestvpn.com/about/"> https://forestvpn.com/about/</a></li>
-            <li> JetBrains Academy contributor </li>
-            <li> Anyd framework: <a href="https://pypi.org/project/anyd/"> https://pypi.org/project/anyd/</a></li>
+            <li> SRE/Chief Technology Officer 1C</li>
+            <li> JetBrains Academy Contributor </li>
+            <li> Anyd Framework: <a href="https://pypi.org/project/anyd/"> https://pypi.org/project/anyd/</a></li>
         </ul>
     </div>
 </div>
