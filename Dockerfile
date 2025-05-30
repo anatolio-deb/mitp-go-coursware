@@ -1,5 +1,5 @@
 FROM node:alpine
-# RUN npm i -g @slidev/cli
+RUN npm i -g @slidev/cli@0.38.8
 RUN apk add git
 WORKDIR /code
 COPY . .
